@@ -85,8 +85,8 @@ const OneTapComponent = () => {
 
   return (
     <>
-      {/* <div id="oneTap" className="fixed top-0 right-0 z-[100]" /> */}
-      <div
+      <div id="oneTap" className="fixed top-0 right-0 z-[100]" />
+      {/* <div
         id="g_id_onload"
         data-client_id="558058766557-3u5fb1vcjvpk4ppgfcqkac5us9ojmru2.apps.googleusercontent.com"
         data-context="signin"
@@ -95,7 +95,7 @@ const OneTapComponent = () => {
         data-auto_select="true"
         data-itp_support="true"
         data-use_fedcm_for_prompt="true"
-      ></div>
+      ></div> */}
     </>
   );
 };
