@@ -51,6 +51,7 @@ const OneTapComponent = () => {
 
       google.accounts.id.initialize({
         client_id: clientId,
+        ux_mode: "redirect",
         callback: async (response: CredentialResponse) => {
           try {
             // send id token returned in response.credential to supabase
