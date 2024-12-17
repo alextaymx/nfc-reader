@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import type { CredentialResponse } from "google-one-tap";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const OneTapComponent = () => {
@@ -24,6 +24,24 @@ const OneTapComponent = () => {
 
     return [nonce, hashedNonce];
   };
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN") {
+          supabase.auth.getUser();
+          redirect("/protected");
+        }
+        // if (event === "SIGNED_OUT") {
+        //   window.location.href = "/";
+        // }
+      }
+    );
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const initializeGoogleOneTap = async () => {
