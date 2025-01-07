@@ -4,8 +4,10 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Provider } from "@supabase/supabase-js";
 
 export const signUpAction = async (formData: FormData) => {
+  const name = formData.get("name")?.toString();
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const supabase = await createClient();
@@ -24,6 +26,10 @@ export const signUpAction = async (formData: FormData) => {
     password,
     options: {
       emailRedirectTo: `${origin}/auth/callback`,
+      data: {
+        name,
+        full_name: name,
+      }
     },
   });
 
@@ -56,6 +62,36 @@ export const signInAction = async (formData: FormData) => {
   return redirect("/protected");
 };
 
+const signInWithThirdPartyAction = (provider: Provider) => async () => {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+  const callbackUrl = `${origin}/auth/callback?next=/protected`;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: callbackUrl,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    }
+  });
+
+  console.log("data", data, 'error', error);
+
+
+  if (error) {
+    return encodedRedirect("error", "/sign-in", error.message);
+  }
+
+  if (data.url) {
+    redirect(data.url) // use the redirect API for your server framework
+  }
+}
+
+export const signInWithGoogleAction = signInWithThirdPartyAction("google");
+
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const supabase = await createClient();
@@ -67,7 +103,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/protected/reset-password`,
+    redirectTo: `${origin}/auth/callback?next=/protected/reset-password`,
   });
 
   if (error) {
