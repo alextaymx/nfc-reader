@@ -1,10 +1,10 @@
-import { signOutAction } from "@/app/actions";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
-import Link from "next/link";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { createClient } from "@/utils/supabase/server";
-import { useEffect } from "react";
+import { signOutAction } from '@/app/actions';
+import { hasEnvVars } from '@/utils/supabase/check-env-vars';
+import { createClient } from '@/utils/supabase/server';
+import { Edit3 } from 'lucide-react';
+import Link from 'next/link';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -18,11 +18,11 @@ export default async function AuthButton() {
   if (!hasEnvVars) {
     return (
       <>
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           <div>
             <Badge
-              variant={"default"}
-              className="font-normal pointer-events-none"
+              variant="default"
+              className="pointer-events-none font-normal"
             >
               Please update .env.local file with anon key and url
             </Badge>
@@ -31,18 +31,18 @@ export default async function AuthButton() {
             <Button
               asChild
               size="sm"
-              variant={"outline"}
+              variant="outline"
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="pointer-events-none cursor-none opacity-75"
             >
               <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button
               asChild
               size="sm"
-              variant={"default"}
+              variant="default"
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="pointer-events-none cursor-none opacity-75"
             >
               <Link href="/sign-up">Sign up</Link>
             </Button>
@@ -51,23 +51,32 @@ export default async function AuthButton() {
       </>
     );
   }
-  return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {displayName || user.email}!
-      <form action={signOutAction}>
-        <Button type="submit" variant={"outline"}>
-          Sign out
-        </Button>
-      </form>
-    </div>
-  ) : (
-    <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
-        <Link href="/sign-in">Sign in</Link>
-      </Button>
-      <Button asChild size="sm" variant={"default"}>
-        <Link href="/sign-up">Sign up</Link>
-      </Button>
-    </div>
-  );
+
+  const message = `Hey, ${displayName || user?.email || ''}!`;
+  return user
+    ? (
+        <div className="flex items-center gap-4">
+          <div className="">
+            {message}
+            <Link href="/profile">
+              <Edit3 size={15} className="m-0 ml-1 inline rounded hover:scale-105 hover:text-blue-600 active:scale-95" />
+            </Link>
+          </div>
+
+          <form action={signOutAction}>
+            <button type="submit" className="btn btn-outline btn-sm">Sign out</button>
+          </form>
+
+        </div>
+      )
+    : (
+        <div className="flex gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
+          <Button asChild size="sm" variant="default">
+            <Link href="/sign-up">Sign up</Link>
+          </Button>
+        </div>
+      );
 }
